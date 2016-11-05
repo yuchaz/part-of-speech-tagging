@@ -12,9 +12,23 @@ MINUS_INFINITY_SENTENCE_LOG_PROB = -1000
 # training_corpus: is a list of the sentences. Each sentence is a string with tokens separated by spaces, ending in a newline character.
 # This function outputs three python dictionaries, where the keys are tuples expressing the ngram and the value is the log probability of that ngram
 def calc_probabilities(training_corpus):
-    unigram_p = {}
-    bigram_p = {}
-    trigram_p = {}
+    unigrams_full_list = []
+    bigrams_full_list = []
+    trigrams_full_list = []
+    for sentence in training_corpus:
+        tokens = sentence.split(' ')[1:-1]
+        unigrams_full_list.extend(tokens)
+        bigrams_full_list.extend(list(nltk.bigrams(tokens)))
+        trigrams_full_list.extend(list(nltk.trigrams(tokens)))
+
+    uni_fdist = dict(nltk.FreqDist(unigrams_full_list))
+    bi_fdist = dict(nltk.FreqDist(bigrams_full_list))
+    tri_fdist = dict(nltk.FreqDist(trigrams_full_list))
+
+    unigram_p = {(k,1): math.log( float(v)/len(unigrams_full_list), 2) for k,v in uni_fdist.items()}
+    bigram_p = {k: math.log( float(v)/len(bigrams_full_list), 2) for k,v in bi_fdist.items()}
+    trigram_p = {k: math.log( float(v)/len(trigrams_full_list), 2) for k,v in tri_fdist.items()}
+
     return unigram_p, bigram_p, trigram_p
 
 # Prints the output for q1
@@ -34,7 +48,7 @@ def q1_output(unigrams, bigrams, trigrams, filename):
         outfile.write('BIGRAM ' + bigram[0] + ' ' + bigram[1]  + ' ' + str(bigrams[bigram]) + '\n')
 
     trigrams_keys = trigrams.keys()
-    trigrams_keys.sort()    
+    trigrams_keys.sort()
     for trigram in trigrams_keys:
         outfile.write('TRIGRAM ' + trigram[0] + ' ' + trigram[1] + ' ' + trigram[2] + ' ' + str(trigrams[trigram]) + '\n')
 
@@ -46,7 +60,7 @@ def q1_output(unigrams, bigrams, trigrams, filename):
 # ngram_p: python dictionary of probabilities of uni-, bi- and trigrams.
 # n: size of the ngram you want to use to compute probabilities
 # corpus: list of sentences to score. Each sentence is a string with tokens separated by spaces, ending in a newline character.
-# This function must return a python list of scores, where the first element is the score of the first sentence, etc. 
+# This function must return a python list of scores, where the first element is the score of the first sentence, etc.
 def score(ngram_p, n, corpus):
     scores = []
     return scores
@@ -109,7 +123,7 @@ def main():
     infile.close()
     infile = open(DATA_PATH + 'Sample2.txt', 'r')
     sample2 = infile.readlines()
-    infile.close() 
+    infile.close()
 
     # score the samples
     sample1scores = linearscore(unigrams, bigrams, trigrams, sample1)
