@@ -16,7 +16,9 @@ def calc_probabilities(training_corpus):
     bigrams_full_list = []
     trigrams_full_list = []
     for sentence in training_corpus:
-        tokens = sentence.split(' ')[1:-1]
+        tokens = sentence.split(' ')[0:-1]
+        tokens.insert(0,START_SYMBOL)
+        tokens.append(STOP_SYMBOL)
         unigrams_full_list.extend(tokens)
         bigrams_full_list.extend(list(nltk.bigrams(tokens)))
         trigrams_full_list.extend(list(nltk.trigrams(tokens)))
