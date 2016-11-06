@@ -28,8 +28,8 @@ def calc_probabilities(training_corpus):
     tri_fdist = dict(nltk.FreqDist(trigrams_full_list))
 
     unigram_p = {(k,1): math.log( float(v)/len(unigrams_full_list), 2) for k,v in uni_fdist.items()}
-    bigram_p = {k: math.log( float(v)/len(bigrams_full_list), 2) for k,v in bi_fdist.items()}
-    trigram_p = {k: math.log( float(v)/len(trigrams_full_list), 2) for k,v in tri_fdist.items()}
+    bigram_p = {k: math.log( float(v)/uni_fdist[k[0]], 2) for k,v in bi_fdist.items()}
+    trigram_p = {k: math.log( float(v)/bi_fdist[(k[0],k[1])], 2) for k,v in tri_fdist.items()}
 
     return unigram_p, bigram_p, trigram_p
 
