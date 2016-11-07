@@ -27,7 +27,7 @@ def calc_probabilities(training_corpus):
     bi_fdist = dict(nltk.FreqDist(bigrams_full_list))
     tri_fdist = dict(nltk.FreqDist(trigrams_full_list))
 
-    unigram_p = {(k,1): math.log( float(v)/len(unigrams_full_list), 2) for k,v in uni_fdist.items()}
+    unigram_p = {(k,): math.log( float(v)/len(unigrams_full_list), 2) for k,v in uni_fdist.items()}
     bigram_p = {k: math.log( float(v)/uni_fdist[k[0]], 2) for k,v in bi_fdist.items()}
     trigram_p = {k: math.log( float(v)/bi_fdist[(k[0],k[1])], 2) for k,v in tri_fdist.items()}
 
@@ -65,6 +65,17 @@ def q1_output(unigrams, bigrams, trigrams, filename):
 # This function must return a python list of scores, where the first element is the score of the first sentence, etc.
 def score(ngram_p, n, corpus):
     scores = []
+    for sentence in corpus:
+        tokens = sentence.split(' ')[0:-1]
+        tokens.insert(0,START_SYMBOL)
+        tokens.append(STOP_SYMBOL)
+        score = .0
+        for i in range(len(tokens)):
+            if i-(n-1) < 0:
+                continue
+            tuple_to_get = tuple(tokens[i-n+1:i+1])
+            score += float(ngram_p.get(tuple_to_get, MINUS_INFINITY_SENTENCE_LOG_PROB))
+        scores.append(score)
     return scores
 
 # Outputs a score to a file
